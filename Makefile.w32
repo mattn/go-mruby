@@ -1,0 +1,7 @@
+all : mruby.dll
+	go build -x .
+
+mruby.dll :
+	cmd /c (cd mruby && mingw32-make)
+	gcc -shared -dll -o mruby.dll mruby.def mruby\lib\libmruby.a
+	dlltool -D mruby.dll -d mruby.def -l libmruby.dll.a
