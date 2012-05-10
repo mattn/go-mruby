@@ -10,7 +10,7 @@ git submodule update
 make
 ```
 
-# Usage
+## Usage
 
 ```go
 package main
@@ -29,10 +29,10 @@ func main() {
 }
 ```
 
-# License
+## License
 
 MIT
 
-# Author
+## Author
 
 * Yasuhiro Matsumoto
