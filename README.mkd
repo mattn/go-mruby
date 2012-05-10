@@ -1,0 +1,36 @@
+# go-mruby
+
+go-mruby make interface to embed mruby into go.
+
+## Install
+
+```
+git submodule init
+git submodule update
+make
+```
+
+# Usage
+
+```go
+package main
+
+import "github.com/mattn/go-mruby"
+
+func main() {
+	mrb := mruby.New()
+	mrb.Eval(`
+      [1,2,3].map {|x|
+        puts x
+      }
+    `)
+}
+```
+
+# License
+
+MIT
+
+# Author
+
+* Yasuhiro Matsumoto
