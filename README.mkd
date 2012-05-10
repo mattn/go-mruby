@@ -8,7 +8,21 @@ go-mruby make interface to embed mruby into go.
 git submodule init
 git submodule update
 make
+cd example
+go build -x .
+LD_LIBRARY_PATH=.. ./example
 ```
+
+On windows, use Makefile.w32
+
+```
+mingw32-make -f Makefile.w32
+copy mruby.dll example
+cd example
+go build -x .
+example.exe
+```
+
 
 ## Usage
 
