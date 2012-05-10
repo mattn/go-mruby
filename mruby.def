@@ -5,12 +5,16 @@ EXPORTS
 	mrb_ary_ref
 	mrb_generate_code
 	mrb_hash_get
+	mrb_hash_new
+	mrb_hash_set
 	mrb_obj_dup
 	mrb_open
+	mrb_p
 	mrb_parse_string
 	mrb_pool_close
 	mrb_proc_new
 	mrb_run
+	mrb_str_new
 	mrb_string_value_ptr
 	mrb_top_self
-	mrb_p
+	mrb_define_global_const

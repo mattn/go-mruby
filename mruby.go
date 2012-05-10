@@ -47,6 +47,7 @@ static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->ire
 */
 import "C"
 import "unsafe"
+import "reflect"
 
 type MRuby struct {
 	mrb *C.mrb_state
@@ -54,6 +55,42 @@ type MRuby struct {
 
 func New() *MRuby {
 	return &MRuby { C.mrb_open() }
+}
+
+func go2mruby(mrb *C.mrb_state, o interface{}) C.mrb_value {
+	v := reflect.ValueOf(o)
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return C.mrb_fixnum_value(C.mrb_int(v.Int()))
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return C.mrb_fixnum_value(C.mrb_int(v.Uint()))
+	case reflect.Float32, reflect.Float64:
+		return C.mrb_float_value((C.mrb_float)(v.Float()))
+	case reflect.Complex64, reflect.Complex128:
+		return C.mrb_float_value((C.mrb_float)(v.Float()))
+	case reflect.String:
+		ptr := C.CString(v.String())
+		return C.mrb_str_new(mrb, ptr, C.strlen(ptr))
+	case reflect.Bool:
+		if v.Bool() {
+			return C.mrb_true_value()
+		}
+		return C.mrb_false_value()
+	case reflect.Array, reflect.Slice:
+		ary := C.mrb_ary_new(mrb)
+		for i := 0; i < v.Len(); i++ {
+			C.mrb_ary_push(mrb, ary, go2mruby(mrb, v.Index(i)))
+		}
+		return ary
+	case reflect.Map:
+		hash := C.mrb_hash_new(mrb, 32)
+		for _, key := range v.MapKeys() {
+			val := v.MapIndex(key)
+			C.mrb_hash_set(mrb, hash, go2mruby(mrb, key.String()), go2mruby(mrb, val))
+		}
+		return hash
+	}
+	return C.mrb_nil_value()
 }
 
 func mruby2go(mrb *C.mrb_state, o C.mrb_value) interface{} {
@@ -91,13 +128,20 @@ func mruby2go(mrb *C.mrb_state, o C.mrb_value) interface{} {
 	return nil
 }
 
-func (m *MRuby) Run(code string) {
+func (m *MRuby) Run(code string, args ...interface{}) {
 	c := C.CString(code)
 	defer C.free(unsafe.Pointer(c))
 	p := C.mrb_parse_string(m.mrb, c)
-	n := C.mrb_generate_code(m.mrb, p.tree);
+	n := C.mrb_generate_code(m.mrb, p.tree)
 	C.mrb_pool_close((*C.mrb_pool)(p.pool))
+	a := C.CString("ARGV")
+	defer C.free(unsafe.Pointer(a))
 	if n >= 0 {
+		ARGV := C.mrb_ary_new(m.mrb)
+		for i := 0; i < len(args); i++ {
+			C.mrb_ary_push(m.mrb, ARGV, go2mruby(m.mrb, args[i]))
+		}
+		C.mrb_define_global_const(m.mrb, a, ARGV)
 		C.mrb_run(
 			m.mrb,
 			C.mrb_proc_new(m.mrb, (*C.mrb_irep)(C._get_irep(m.mrb, n))),
@@ -109,13 +153,20 @@ func (m *MRuby) Run(code string) {
 	}
 }
 
-func (m *MRuby) Eval(code string) interface{} {
+func (m *MRuby) Eval(code string, args ...interface{}) interface{} {
 	c := C.CString(code)
 	defer C.free(unsafe.Pointer(c))
 	p := C.mrb_parse_string(m.mrb, c)
-	n := C.mrb_generate_code(m.mrb, p.tree);
+	n := C.mrb_generate_code(m.mrb, p.tree)
 	C.mrb_pool_close((*C.mrb_pool)(p.pool))
+	a := C.CString("ARGV")
+	defer C.free(unsafe.Pointer(a))
 	if n >= 0 {
+		ARGV := C.mrb_ary_new(m.mrb)
+		for i := 0; i < len(args); i++ {
+			C.mrb_ary_push(m.mrb, ARGV, go2mruby(m.mrb, args[i]))
+		}
+		C.mrb_define_global_const(m.mrb, a, ARGV)
 		C.mrb_run(
 			m.mrb,
 			C.mrb_proc_new(m.mrb, (*C.mrb_irep)(C._get_irep(m.mrb, n))),
