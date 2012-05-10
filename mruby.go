@@ -41,7 +41,7 @@ static int _RARRAY_LEN(mrb_value a) { return (RARRAY(a)->len); }
 static int _mrb_fixnum(mrb_value o) { return (int) mrb_fixnum(o); }
 static float _mrb_float(mrb_value o) { return (float) mrb_float(o); }
 static struct mrb_irep* _get_irep(mrb_state *mrb, int n) { return mrb->irep[n]; }
-static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->irep[n]->nlocals]; }
+//static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->irep[n]->nlocals]; }
 
 #cgo LDFLAGS: ./libmruby.dll.a
 */
@@ -167,11 +167,16 @@ func (m *MRuby) Eval(code string, args ...interface{}) interface{} {
 			C.mrb_ary_push(m.mrb, ARGV, go2mruby(m.mrb, args[i]))
 		}
 		C.mrb_define_global_const(m.mrb, a, ARGV)
-		C.mrb_run(
+		return mruby2go(m.mrb, C.mrb_run(
 			m.mrb,
 			C.mrb_proc_new(m.mrb, (*C.mrb_irep)(C._get_irep(m.mrb, n))),
-			C.mrb_top_self(m.mrb))
+			C.mrb_top_self(m.mrb)))
 	}
+	return C.mrb_nil_value()
+}
 
-	return mruby2go(m.mrb, C._get_result(m.mrb, n))
+func (m *MRuby) Close() {
+	if m.mrb != nil {
+		C.mrb_close(m.mrb)
+	}
 }

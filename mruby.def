@@ -18,3 +18,4 @@ EXPORTS
 	mrb_string_value_ptr
 	mrb_top_self
 	mrb_define_global_const
+	mrb_close
