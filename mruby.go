@@ -81,16 +81,18 @@ func go2mruby(mrb *C.mrb_state, o interface{}) C.mrb_value {
 	case reflect.Array, reflect.Slice:
 		ary := C.mrb_ary_new(mrb)
 		for i := 0; i < v.Len(); i++ {
-			C.mrb_ary_push(mrb, ary, go2mruby(mrb, v.Index(i)))
+			C.mrb_ary_push(mrb, ary, go2mruby(mrb, v.Index(i).Interface()))
 		}
 		return ary
 	case reflect.Map:
 		hash := C.mrb_hash_new(mrb, 32)
 		for _, key := range v.MapKeys() {
 			val := v.MapIndex(key)
-			C.mrb_hash_set(mrb, hash, go2mruby(mrb, key.String()), go2mruby(mrb, val))
+			C.mrb_hash_set(mrb, hash, go2mruby(mrb, key.String()), go2mruby(mrb, val.Interface()))
 		}
 		return hash
+	case reflect.Interface:
+		return go2mruby(mrb, v.Elem().Interface())
 	}
 	return C.mrb_nil_value()
 }
