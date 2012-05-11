@@ -11,4 +11,9 @@ func main() {
 	for _, i := range mrb.Eval(`ARGV.map {|x| x + 1}`, 1, 2, 3).([]interface{}) {
 		println(i.(int32)) // 2 3 4
 	}
+
+	mrb.Run(`p ARGV[0]`, map[string]interface{} {
+		"foo": "bar",
+		"bar": "baz",
+	})
 }
