@@ -1,17 +1,17 @@
 package mruby
 
 /*
-#include "mruby/include/mruby.h"
-#include "mruby/include/mruby/proc.h"
-#include "mruby/include/mruby/data.h"
+#include <mruby.h>
+#include <mruby/proc.h>
+#include <mruby/data.h>
 #undef INCLUDE_ENCODING
-#include "mruby/include/mruby/string.h"
-#include "mruby/include/mruby/khash.h"
-#include "mruby/include/mruby/hash.h"
-#include "mruby/include/mruby/array.h"
-#include "mruby/include/mruby/class.h"
-#include "mruby/include/mruby/object.h"
-#include "mruby/include/mruby/variable.h"
+#include <mruby/string.h>
+#include <mruby/khash.h>
+#include <mruby/hash.h>
+#include <mruby/array.h>
+#include <mruby/class.h>
+#include <mruby/object.h>
+#include <mruby/variable.h>
 #include "mruby/src/compile.h"
 
 extern khint_t mrb_hash_ht_hash_func(mrb_state *mrb, mrb_value key);
@@ -43,7 +43,9 @@ static float _mrb_float(mrb_value o) { return (float) mrb_float(o); }
 static struct mrb_irep* _get_irep(mrb_state *mrb, int n) { return mrb->irep[n]; }
 //static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->irep[n]->nlocals]; }
 
-#cgo LDFLAGS: ./libmruby.dll.a
+#cgo CFLAGS: -I. -Imruby/include
+#cgo linux LDFLAGS: -L. libmruby.so -lm
+#cgo windows LDFLAGS: ./libmruby.dll.a
 */
 import "C"
 import "unsafe"
