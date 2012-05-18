@@ -12,7 +12,7 @@ package mruby
 #include <mruby/class.h>
 #include <mruby/object.h>
 #include <mruby/variable.h>
-#include "mruby/src/compile.h"
+#include <mruby/compile.h>
 
 extern khint_t mrb_hash_ht_hash_func(mrb_state *mrb, mrb_value key);
 extern khint_t mrb_hash_ht_hash_equal(mrb_state *mrb, mrb_value a, mrb_value b);
@@ -43,7 +43,7 @@ static float _mrb_float(mrb_value o) { return (float) mrb_float(o); }
 static struct mrb_irep* _get_irep(mrb_state *mrb, int n) { return mrb->irep[n]; }
 //static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->irep[n]->nlocals]; }
 
-#cgo CFLAGS: -I. -Imruby/include
+#cgo CFLAGS: -Imruby/include -Imruby/src
 #cgo linux LDFLAGS: -L. libmruby.so -lm
 #cgo windows LDFLAGS: ./libmruby.dll.a
 */

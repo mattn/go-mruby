@@ -350,7 +350,6 @@ EXPORTS
 	mrb_p
 	mrb_parse_file
 	mrb_parse_nstring
-	mrb_parse_nstring_ext
 	mrb_parse_string
 	mrb_parser_filename
 	mrb_parser_lineno
