@@ -44,7 +44,7 @@ static struct mrb_irep* _get_irep(mrb_state *mrb, int n) { return mrb->irep[n]; 
 //static mrb_value _get_result(mrb_state *mrb, int n) { return mrb->stack[mrb->irep[n]->nlocals]; }
 
 #cgo CFLAGS: -Imruby/include
-#cgo linux LDFLAGS: -L. libmruby.so -lm
+#cgo linux LDFLAGS: -L. mruby/lib/libmruby.a -lm
 #cgo windows LDFLAGS: ./libmruby.dll.a
 */
 import "C"

@@ -1,8 +1,5 @@
-all : libmruby.so
+all : mruby/lib/libmruby.a
 	go build -x .
-
-libmruby.so : mruby/lib/libmruby.a
-	ld --whole-archive -shared -o libmruby.so mruby/lib/libmruby.a
 
 mruby/lib/libmruby.a :
 	(cd mruby && make)
