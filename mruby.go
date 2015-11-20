@@ -147,7 +147,6 @@ func (m *MRuby) Eval(code string, args ...interface{}) interface{} {
 	}
 	C.mrb_define_global_const(m.mrb, a, ARGV)
 	return mruby2go(m.mrb, C.mrb_run(m.mrb, n, C.mrb_top_self(m.mrb)))
-	return C.mrb_nil_value()
 }
 
 func (m *MRuby) Close() {
